@@ -103,7 +103,7 @@
             element: currentElement,
             intro: currentElement.getAttribute('data-intro'),
             step: parseInt(currentElement.getAttribute('data-step'), 10),
-	    tooltipClass: currentElement.getAttribute('data-tooltipClass'),
+      tooltipClass: currentElement.getAttribute('data-tooltipClass'),
             position: currentElement.getAttribute('data-position') || this._options.tooltipPosition
           };
         }
@@ -129,7 +129,7 @@
             element: currentElement,
             intro: currentElement.getAttribute('data-intro'),
             step: nextStep + 1,
-	    tooltipClass: currentElement.getAttribute('data-tooltipClass'),
+      tooltipClass: currentElement.getAttribute('data-tooltipClass'),
             position: currentElement.getAttribute('data-position') || this._options.tooltipPosition
           };
         }
@@ -241,6 +241,9 @@
       return;
     }
 
+
+
+
     var nextStep = this._introItems[this._currentStep];
     if (typeof (this._introBeforeChangeCallback) !== 'undefined') {
       this._introBeforeChangeCallback.call(this, nextStep.element);
@@ -266,6 +269,11 @@
     }
 
     _showElement.call(this, nextStep);
+  
+
+
+
+
   }
 
   /**
@@ -342,6 +350,30 @@
       tooltipCssClass = this._options.tooltipClass;
     }
 
+
+    // add overlay and helper class
+    var currentStepObj = this._introItems[this._currentStep];
+    var overlayLayer = $('.introjs-overlay')[0];
+    if (typeof (currentStepObj.overlayClass) === 'string') {
+        overlayLayer.className = 'introjs-overlay ' + currentStepObj.overlayClass;
+    }else{
+        overlayLayer.className = 'introjs-overlay';
+    }
+
+    // add helper class
+    var overlayLayer = $('.introjs-helperLayer')[0];
+    if (typeof (currentStepObj.helperClass) === 'string') {
+        overlayLayer.className = 'introjs-helperLayer ' + currentStepObj.overlayClass;
+    }else{
+        overlayLayer.className = 'introjs-helperLayer';
+    }
+
+    // add callback
+    if (typeof (currentStepObj.onShow) == 'function') {
+      currentStepObj.onShow.call();
+    }
+
+
     tooltipLayer.className = ('introjs-tooltip ' + tooltipCssClass).replace(/^\s+|\s+$/g, '');
 
     //custom css class for tooltip boxes
@@ -351,7 +383,7 @@
     switch (currentTooltipPosition) {
       case 'top':
         tooltipLayer.style.left = '15px';
-        tooltipLayer.style.top = '-' + (_getOffset(tooltipLayer).height + 10) + 'px';
+        tooltipLayer.style.top = '-' + (_getOffset(tooltipLayer).height + 30) + 'px';
         arrowLayer.className = 'introjs-arrow bottom';
         break;
       case 'right':
@@ -623,16 +655,22 @@
     if (!_elementInViewport(targetElement.element)) {
       var rect = targetElement.element.getBoundingClientRect(),
         winHeight=_getWinSize().height,
-        top = rect.bottom - (rect.bottom - rect.top),
+        top = rect.bottom - (rect.bottom - rect.top) ,
         bottom = rect.bottom - winHeight;
 
       //Scroll up
       if (top < 0 || targetElement.element.clientHeight > winHeight) {
-        window.scrollBy(0, top - 30); // 30px padding from edge to look nice
+          $('html, body').animate({
+            scrollTop: top - 30
+          },200);
+        // window.scrollBy(0, top - 30); // 30px padding from edge to look nice
 
       //Scroll down
       } else {
-        window.scrollBy(0, bottom + 100); // 70px + 30px padding from edge to look nice
+          $('html, body').animate({
+            scrollTop:  bottom + 100
+          },200);        
+        // window.scrollBy(0, bottom + 100); // 70px + 30px padding from edge to look nice
       }
     }
   }
@@ -741,7 +779,7 @@
     };
 
     setTimeout(function() {
-      styleText += 'opacity: .8;';
+      styleText += 'opacity: .5;';
       overlayLayer.setAttribute('style', styleText);
     }, 10);
     return true;
